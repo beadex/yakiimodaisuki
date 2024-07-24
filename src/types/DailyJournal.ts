@@ -1,4 +1,4 @@
-import type { EntryFieldTypes, EntrySys } from "contentful";
+import type { EntryFieldTypes } from "contentful";
 
 export type DailyJournal = {
   contentTypeId: "daily-journal";
