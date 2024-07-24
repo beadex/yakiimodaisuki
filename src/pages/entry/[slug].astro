@@ -1,0 +1,40 @@
+---
+import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import { contentfulClient } from "../../lib/contentful";
+import type { DailyJournal } from "../../types";
+
+export async function getStaticPaths() {
+  const { items } = await contentfulClient.getEntries<DailyJournal>({
+    content_type: "daily-journal",
+  });
+  const pages = items.map((item) => ({
+    params: { slug: item.fields.slug },
+    props: {
+      title: item.fields.title,
+      description: item.fields.description,
+      content: documentToHtmlString(item.fields.content),
+      date: new Date(item.fields.date).toLocaleDateString(),
+    },
+  }));
+  return pages;
+}
+
+const { content, title, description, date } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+  <body>
+    <Header />
+    <main class="flex flex-col gap-2">
+      <h2>{title}</h2>
+      <time>{date}</time>
+      <article set:html={content} />
+    </main>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { contentfulClient } from "../lib/contentful";
+import type { DailyJournal } from "../types";
+
+const entries = await contentfulClient.getEntries<DailyJournal>({
+  content_type: "daily-journal",
+  order: ["-fields.date", "sys.contentType.sys.id"],
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <div class="flex flex-col gap-2">
+        {
+          entries.items.map((item) => (
+            <section>
+              <h3 class="font-medium">
+                <a href={`/entry/${item.fields.slug}`}>{item.fields.title}</a>
+              </h3>
+            </section>
+          ))
+        }
+      </div>
+    </main>
+  </body>
+</html>
